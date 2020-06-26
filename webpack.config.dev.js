@@ -8,7 +8,7 @@ module.exports = {
   mode: "development",
   target: "web",
   devtool: "cheap-module-source-map",
-  entry: "./src/index",
+  entry: ["./src/index", "./src/index.scss"],
   output: {
     path: path.resolve(__dirname, "build"),
     publicPath: "/",
@@ -37,8 +37,8 @@ module.exports = {
         use: ["babel-loader", "eslint-loader"]
       },
       {
-        test: /(\.css)$/,
-        use: ["style-loader", "css-loader"]
+        test: /(\.css|s(a|c)ss)$/,
+        use: ["style-loader", "css-loader", "sass-loader"]
       }
     ]
   }
