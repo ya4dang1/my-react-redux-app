@@ -3,67 +3,69 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
 import * as bookActions from "../../redux/actions/bookActions";
+import * as authorActions from "../../redux/actions/authorActions";
+import BookList from "./BookList";
 
 class BooksPage extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
+    const { actions, books, authors } = this.props;
 
-    this.state = {
-      book: {
-        title: ""
-      }
-    };
+    if (books.length === 0) {
+      actions.loadBooks().catch(error => {
+        alert("Loading books failed", error);
+      });
+    }
+
+    if (authors.length === 0) {
+      actions.loadAuthors().catch(error => {
+        alert("Loading authors failed", error);
+      });
+    }
   }
-
-  handleChange = event => {
-    let { book } = this.state;
-    book = { ...book, title: event.target.value };
-    this.setState({ book });
-  };
-
-  handleSubmit = event => {
-    const { actions } = this.props;
-    const { book } = this.state;
-    event.preventDefault();
-    actions.createBook(book);
-  };
 
   render() {
     const { books } = this.props;
-    const { book } = this.state;
     return (
-      <form onSubmit={this.handleSubmit}>
+      <>
         <h2>Books</h2>
-        <h3>Add Book</h3>
-        <input type="text" onChange={this.handleChange} value={book.title} />
-
-        <input type="submit" value="Save" />
-        {books.map(c => (
-          <div key={c.title}>{c.title}</div>
-        ))}
-      </form>
+        <BookList books={books} />
+      </>
     );
   }
 }
 
 BooksPage.propTypes = {
   actions: PropTypes.objectOf(PropTypes.func).isRequired,
-  books: PropTypes.arrayOf(PropTypes.object)
+  books: PropTypes.arrayOf(PropTypes.object),
+  authors: PropTypes.arrayOf(PropTypes.object)
 };
 
 BooksPage.defaultProps = {
-  books: {}
+  books: [],
+  authors: []
 };
 
 function mapStateToProps(state) {
   return {
-    books: state.books
+    books:
+      state.authors.length === 0
+        ? []
+        : state.books.map(book => {
+            return {
+              ...book,
+              authorName: state.authors.find(a => a.id === book.authorId).name
+            };
+          }),
+    authors: state.authors
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(bookActions, dispatch)
+    actions: {
+      loadBooks: bindActionCreators(bookActions.loadBooks, dispatch),
+      loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch)
+    }
   };
 }
 
