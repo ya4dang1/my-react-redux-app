@@ -6,7 +6,7 @@ export function loadAuthorsSuccess(authors) {
 }
 
 // every thunk returns a function that accepts dispatch as an argument
-export function loadAuthors(author) {
+export function loadAuthors() {
   // redux thunk injects dispatch so we don't have to
   return dispatch => {
     return authorApi
