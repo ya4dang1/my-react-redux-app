@@ -1,33 +1,50 @@
 import React from "react";
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
+import { Redirect } from "react-router-dom";
+import PropTypes from "prop-types";
 import * as bookActions from "../../redux/actions/bookActions";
 import * as authorActions from "../../redux/actions/authorActions";
 import BookList from "./BookList";
 
 class BooksPage extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      // eslint-disable-next-line react/no-unused-state
+      redirectToAddBookPage: false
+    };
+  }
+
   componentDidMount() {
-    const { actions, books, authors } = this.props;
+    const { actions } = this.props;
 
-    if (books.length === 0) {
-      actions.loadBooks().catch(error => {
-        alert("Loading books failed", error);
-      });
-    }
+    actions.loadBooks().catch(error => {
+      alert("Loading books failed", error);
+    });
 
-    if (authors.length === 0) {
-      actions.loadAuthors().catch(error => {
-        alert("Loading authors failed", error);
-      });
-    }
+    actions.loadAuthors().catch(error => {
+      alert("Loading authors failed", error);
+    });
   }
 
   render() {
     const { books } = this.props;
+    const { redirectToAddBookPage } = this.state;
+
     return (
       <>
+        {redirectToAddBookPage && <Redirect to="/book" />}
         <h2>Books</h2>
+        <button
+          type="button"
+          style={{ marginBottom: 20 }}
+          className="btn btn-primary add-book"
+          onClick={() => this.setState({ redirectToAddBookPage: true })}
+        >
+          Add Book
+        </button>
         <BookList books={books} />
       </>
     );
@@ -36,13 +53,11 @@ class BooksPage extends React.Component {
 
 BooksPage.propTypes = {
   actions: PropTypes.objectOf(PropTypes.func).isRequired,
-  books: PropTypes.arrayOf(PropTypes.object),
-  authors: PropTypes.arrayOf(PropTypes.object)
+  books: PropTypes.arrayOf(PropTypes.object)
 };
 
 BooksPage.defaultProps = {
-  books: [],
-  authors: []
+  books: []
 };
 
 function mapStateToProps(state) {
