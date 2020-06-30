@@ -11,6 +11,8 @@ export default function bookReducer(state = initialState.books, action) {
       return state.map(book =>
         book.id === action.book.id ? action.book : book
       );
+    case types.DELETE_BOOK_OPTIMISTIC:
+      return state.filter(book => book.id !== action.book.id);
     default:
       return state;
   }
