@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+import Spinner from "../common/Spinner";
 import * as BookActions from "../../redux/actions/bookActions";
 import * as AuthorActions from "../../redux/actions/authorActions";
 import BookForm from "./BookForm";
@@ -17,10 +19,12 @@ function ManageBookPage({
 }) {
   const [book, setBook] = useState({ ...initialBook });
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (books.length === 0) {
       loadBooks().catch(error => {
+        // eslint-disable-next-line no-alert
         alert("Loading books failed", error);
       });
     } else {
@@ -30,6 +34,7 @@ function ManageBookPage({
 
     if (authors.length === 0) {
       loadAuthors().catch(error => {
+        // eslint-disable-next-line no-alert
         alert("Loading authors failed", error);
       });
     }
@@ -44,20 +49,45 @@ function ManageBookPage({
     }));
   }
 
-  function handleSave(event) {
-    event.preventDefault();
-    saveBook(book).then(() => {
-      history.push("/books");
-    });
+  function formIsValid() {
+    const { title, authorId, category } = book;
+    const formErrors = {};
+
+    if (!title) formErrors.title = "Title is required.";
+    if (!authorId) formErrors.author = "Author is required.";
+    if (!category) formErrors.category = "Category is required.";
+
+    setErrors(formErrors);
+
+    return Object.keys(formErrors).length === 0;
   }
 
-  return (
+  function handleSave(event) {
+    event.preventDefault();
+    if (!formIsValid()) return;
+
+    setSaving(true);
+    saveBook(book)
+      .then(() => {
+        toast.success("Book saved.");
+        history.push("/books");
+      })
+      .catch(error => {
+        setSaving(false);
+        setErrors({ onSave: error.message });
+      });
+  }
+
+  return authors.length === 0 || books.length === 0 ? (
+    <Spinner />
+  ) : (
     <BookForm
       book={book}
       errors={errors}
       authors={authors}
       onChange={handleChange}
       onSave={handleSave}
+      saving={saving}
     />
   );
 }
@@ -88,7 +118,9 @@ function mapStateToProps(state, ownProps) {
   // The placeholder in React Route :slug is accessed here via ownProps.params.match.slug
   const { slug } = ownProps.match.params;
   const book =
-    slug && state.books.length > 0 ? getBookBySlug(state.books, slug) : newBook;
+    slug && state.books.length > 0 && state.authors.length > 0
+      ? getBookBySlug(state.books, slug)
+      : newBook;
   return {
     book,
     books: state.books,
