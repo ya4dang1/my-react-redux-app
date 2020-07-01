@@ -45,7 +45,7 @@ server.use((req, res, next) => {
   next();
 });
 
-server.post("/courses/", function(req, res, next) {
+server.post("/books/", function(req, res, next) {
   const error = validateCourse(req.body);
   if (error) {
     res.status(400).send(error);
