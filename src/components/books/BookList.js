@@ -6,7 +6,6 @@ const BookList = ({ books, onDeleteClick }) => (
   <table className="table">
     <thead>
       <tr>
-        <th>&nbsp;</th>
         <th>Title</th>
         <th>Author</th>
         <th>Category</th>
@@ -17,14 +16,6 @@ const BookList = ({ books, onDeleteClick }) => (
       {books.map(book => {
         return (
           <tr key={book.id}>
-            <td>
-              <a
-                className="btn btn-light"
-                href={`http://pluralsight.com/books/${book.slug}`}
-              >
-                Watch
-              </a>
-            </td>
             <td>
               <Link to={`/book/${book.slug}`}>{book.title}</Link>
             </td>
