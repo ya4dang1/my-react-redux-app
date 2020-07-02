@@ -7,6 +7,7 @@ import HomePage from "./home/HomePage";
 import AboutPage from "./about/AboutPage";
 import PageNotFound from "./PageNotFound";
 import BooksPage from "./books/BooksPage";
+// eslint-disable-next-line import/no-named-as-default
 import ManageBookPage from "./books/ManageBookPage";
 
 const App = () => {
