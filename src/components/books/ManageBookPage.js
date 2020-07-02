@@ -8,7 +8,7 @@ import * as AuthorActions from "../../redux/actions/authorActions";
 import BookForm from "./BookForm";
 import { newBook } from "../../../tools/mockData";
 
-function ManageBookPage({
+export function ManageBookPage({
   book: initialBook,
   books,
   authors,
